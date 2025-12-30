@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简日记</title>
+    <!-- 引入外部CSS样式文件 -->
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入LeanCloud SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部标题 -->
+        <div class="header">
+            <h1>📔 极简日记</h1>
+            
+            <!-- 工具栏：搜索、新建、导入、导出 -->
+            <div class="toolbar">
+                <input type="text" class="search-box" id="searchInput" placeholder="搜索日记内容或标签...">
+                <button class="btn btn-primary" id="newDiaryBtn" onclick="showEditor()">+ 新建日记</button>
+                <button class="btn btn-secondary" onclick="exportData()">导出备份</button>
+                <button class="btn btn-secondary" onclick="importData()">导入备份</button>
+                <input type="file" class="file-input" id="fileInput" accept=".json" onchange="handleFileImport(event)">
+            </div>
+        </div>
+
+        <!-- 日记列表区域 -->
+        <div class="diary-list" id="diaryList">
+            <!-- 日记项将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 编辑/新建日记区域 -->
+        <div class="editor" id="editor">
+            <div class="editor-header">
+                <div class="editor-title" id="editorTitle">新建日记</div>
+                <button class="btn btn-secondary btn-small" onclick="hideEditor()">取消</button>
+            </div>
+            
+            <form id="diaryForm" onsubmit="saveDiary(event)">
+                <!-- 日期选择 -->
+                <div class="form-group">
+                    <label class="form-label">日期</label>
+                    <input type="date" class="form-input" id="diaryDate" required>
+                </div>
+
+                <!-- 标题输入 -->
+                <div class="form-group">
+                    <label class="form-label">标题</label>
+                    <input type="text" class="form-input" id="diaryTitle" placeholder="输入日记标题..." required>
+                </div>
+
+                <!-- 内容输入 -->
+                <div class="form-group">
+                    <label class="form-label">内容</label>
+                    <textarea class="form-input form-textarea" id="diaryContent" placeholder="记录你的想法和灵感..." required></textarea>
+                </div>
+
+                <!-- 标签输入 -->
+                <div class="form-group">
+                    <label class="form-label">标签（用逗号分隔）</label>
+                    <input type="text" class="form-input form-tags" id="diaryTags" placeholder="例如：工作, 灵感, 生活">
+                    <div class="tags-hint">多个标签请用逗号分隔，如：工作, 灵感, 生活</div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="editor-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideEditor()">取消</button>
+                    <button type="submit" class="btn btn-primary" id="saveDiaryBtn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 引入外部JavaScript文件 -->
+    <script src="script.js"></script>
+</body>
+</html>
