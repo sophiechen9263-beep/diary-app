@@ -244,6 +244,88 @@ body {
     justify-content: flex-end;
 }
 
+/* 富文本编辑器工具栏 */
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.editor-toolbar .btn-small {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #e0e0e0;
+    margin: 0 4px;
+}
+
+/* 富文本内容区域样式 */
+.rich-text-editor {
+    min-height: 240px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.6;
+    outline: none;
+    background-color: #fff;
+    overflow-y: auto;
+}
+
+.rich-text-editor:focus {
+    border-color: #999;
+}
+
+/* 恢复富文本内容中列表的缩进，避免列表符号贴在左边框 */
+.rich-text-editor ul,
+.rich-text-editor ol {
+    margin-left: 1.5em;
+    padding-left: 1.5em;
+}
+
+.rich-text-editor li {
+    margin: 2px 0;
+}
+
+.rich-text-editor:focus {
+    border-color: #999;
+}
+
+.rich-text-editor img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 8px 0;
+}
+
+.rich-text-editor table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.rich-text-editor th,
+.rich-text-editor td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    font-size: 13px;
+}
+
+.rich-text-editor th {
+    background-color: #f0f0f0;
+    font-weight: 500;
+}
+
+/* 隐藏的图片文件输入框，仅通过按钮触发 */
+.image-file-input {
+    display: none;
+}
+
 /* 空状态提示 */
 .empty-state {
     text-align: center;
@@ -312,5 +394,4 @@ body {
         width: 100%;
     }
 }
-
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极简日记</title>
+    <title>Journal 2025</title>
     <!-- 引入外部CSS样式文件 -->
     <link rel="stylesheet" href="style.css">
     <!-- 引入LeanCloud SDK -->
@@ -13,7 +13,7 @@
     <div class="container">
         <!-- 头部标题 -->
         <div class="header">
-            <h1>📔 极简日记</h1>
+            <h1>📔 Journal 2025</h1>
             
             <!-- 工具栏：搜索、新建、导入、导出 -->
             <div class="toolbar">
@@ -50,10 +50,35 @@
                     <input type="text" class="form-input" id="diaryTitle" placeholder="输入日记标题..." required>
                 </div>
                 
-                <!-- 内容输入 -->
+                <!-- 内容输入（富文本编辑器） -->
                 <div class="form-group">
                     <label class="form-label">内容</label>
-                    <textarea class="form-input form-textarea" id="diaryContent" placeholder="记录你的想法和灵感..." required></textarea>
+                    <!-- 富文本工具栏 -->
+                    <div class="editor-toolbar">
+                        <button type="button" class="btn btn-secondary btn-small" onclick="toggleBold()" title="加粗 (Bold)"><b>B</b></button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="applyHeading('P')" title="正文">P</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="applyHeading('H1')" title="标题 1">H1</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="applyHeading('H2')" title="标题 2">H2</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="applyHeading('H3')" title="标题 3">H3</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="applyHeading('H4')" title="标题 4">H4</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="applyHeading('H5')" title="标题 5">H5</button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="insertOrderedList()" title="有序列表">1.</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="insertUnorderedList()" title="无序列表">•</button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="insertTablePrompt()" title="插入表格">表格</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="triggerImageUpload()" title="插入本地图片">📁 图</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="insertImageByUrlPrompt()" title="通过链接插入图片">🌐 图</button>
+                        <!-- 隐藏的图片上传输入 -->
+                        <input type="file" id="imageFileInput" accept="image/*" class="image-file-input" onchange="handleImageUpload(event)">
+                    </div>
+                    <!-- 可编辑内容区域，所见即所得 -->
+                    <div
+                        id="diaryContentEditor"
+                        class="form-input form-textarea rich-text-editor"
+                        contenteditable="true"
+                        placeholder="记录你的想法和灵感..."
+                    ></div>
                 </div>
                 
                 <!-- 标签输入 -->
@@ -76,4 +101,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-*** End of File

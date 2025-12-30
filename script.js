@@ -154,10 +154,8 @@ async function renderDiaryList(diaries = null) {
             ? `<div class="diary-item-tags">${diary.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>`
             : '';
 
-        // 截取内容预览（前100个字符）
-        const contentPreview = diary.content.length > 100
-            ? diary.content.substring(0, 100) + '...'
-            : diary.content;
+        // 截取内容预览（前100个“可见文字”字符，忽略HTML标签）
+        const contentPreview = getTextPreviewFromHtml(diary.content || '', 100);
 
         return `
             <div class="diary-item" onclick="viewDiary('${diary.id}')">
@@ -188,6 +186,21 @@ function escapeHtml(text) {
 }
 
 /**
+ * 从HTML字符串中提取纯文本并截断为指定长度
+ * @param {string} html - 原始HTML内容
+ * @param {number} maxLength - 最大字符数
+ * @returns {string} 截断后的纯文本
+ */
+function getTextPreviewFromHtml(html, maxLength) {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const text = div.textContent || div.innerText || '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+/**
  * 显示编辑区域
  */
 function showEditor() {
@@ -197,6 +210,12 @@ function showEditor() {
     // 重置表单
     document.getElementById('diaryForm').reset();
     document.getElementById('editorTitle').textContent = '新建日记';
+
+    // 清空富文本内容区域
+    const contentEditor = document.getElementById('diaryContentEditor');
+    if (contentEditor) {
+        contentEditor.innerHTML = '';
+    }
     
     // 设置默认日期为今天
     const today = new Date().toISOString().split('T')[0];
@@ -213,6 +232,12 @@ function hideEditor() {
     const editor = document.getElementById('editor');
     editor.classList.remove('active');
     document.getElementById('diaryForm').reset();
+
+    // 同时清空富文本内容区域
+    const contentEditor = document.getElementById('diaryContentEditor');
+    if (contentEditor) {
+        contentEditor.innerHTML = '';
+    }
 }
 
 /**
@@ -243,7 +268,11 @@ async function editDiary(id) {
     // 填充表单数据
     document.getElementById('diaryDate').value = diary.date;
     document.getElementById('diaryTitle').value = diary.title;
-    document.getElementById('diaryContent').value = diary.content;
+    const contentEditor = document.getElementById('diaryContentEditor');
+    if (contentEditor) {
+        // 直接填充HTML，保持原有格式
+        contentEditor.innerHTML = diary.content || '';
+    }
     document.getElementById('diaryTags').value = diary.tags ? diary.tags.join(', ') : '';
     document.getElementById('editorTitle').textContent = '编辑日记';
     
@@ -268,7 +297,9 @@ async function saveDiary(event) {
     // 获取表单数据
     const date = document.getElementById('diaryDate').value;
     const title = document.getElementById('diaryTitle').value.trim();
-    const content = document.getElementById('diaryContent').value.trim();
+    // 从富文本编辑器中读取HTML内容
+    const contentEditor = document.getElementById('diaryContentEditor');
+    const content = contentEditor ? contentEditor.innerHTML.trim() : '';
     const tagsInput = document.getElementById('diaryTags').value.trim();
     
     // 处理标签（按逗号分割，去除空白）
@@ -501,6 +532,12 @@ async function init() {
     // 设置默认日期为今天
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('diaryDate').value = today;
+
+    // 初始化时确保富文本编辑器存在
+    const contentEditor = document.getElementById('diaryContentEditor');
+    if (contentEditor && !contentEditor.innerHTML) {
+        contentEditor.innerHTML = '';
+    }
 }
 
 // 页面加载完成后执行初始化
@@ -515,7 +552,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const newDiaryBtn = document.getElementById('newDiaryBtn');
     const saveDiaryBtn = document.getElementById('saveDiaryBtn');
-    const diaryContentInput = document.getElementById('diaryContent');
+    const diaryContentInput = document.getElementById('diaryContentEditor');
     const diaryListEl = document.getElementById('diaryList');
 
     // 1. newDiaryBtn：显示输入框和保存按钮，清空内容
@@ -528,9 +565,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 showEditor();
             }
 
-            // 清空内容输入框
+            // 清空内容输入区域
             if (diaryContentInput) {
-                diaryContentInput.value = '';
+                diaryContentInput.innerHTML = '';
             }
 
             alert('开始新建日记');
@@ -589,5 +626,152 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     })();
 });
+
+// ============================================
+// 富文本编辑相关函数
+// ============================================
+
+/**
+ * 工具函数：确保光标聚焦在富文本编辑区域
+ */
+function focusContentEditor() {
+    const editor = document.getElementById('diaryContentEditor');
+    if (!editor) return;
+    editor.focus();
+}
+
+/**
+ * 通用命令执行封装
+ * @param {string} command - document.execCommand 的命令名
+ * @param {string|null} value - 可选的命令值
+ */
+function execEditorCommand(command, value = null) {
+    focusContentEditor();
+    // 使用原生 execCommand 实现所见即所得编辑
+    document.execCommand(command, false, value);
+}
+
+/**
+ * 切换加粗（使用 <b>/<strong> 标签）
+ */
+function toggleBold() {
+    execEditorCommand('bold');
+}
+
+/**
+ * 应用标题层级（或恢复为段落）
+ * @param {string} level - 'P' | 'H1' | 'H2' | 'H3' | 'H4' | 'H5'
+ */
+function applyHeading(level) {
+    focusContentEditor();
+    if (level === 'P') {
+        document.execCommand('formatBlock', false, 'P');
+    } else {
+        document.execCommand('formatBlock', false, level);
+    }
+}
+
+/**
+ * 插入有序列表（1. 2. 3. ...）
+ */
+function insertOrderedList() {
+    execEditorCommand('insertOrderedList');
+}
+
+/**
+ * 插入无序列表（• 项目符号）
+ */
+function insertUnorderedList() {
+    execEditorCommand('insertUnorderedList');
+}
+
+/**
+ * 插入表格（通过 prompt 获取行列数，最大 20x20）
+ */
+function insertTablePrompt() {
+    focusContentEditor();
+
+    let rows = prompt('请输入表格行数（1-20）：', '3');
+    if (rows === null) return;
+    let cols = prompt('请输入表格列数（1-20）：', '3');
+    if (cols === null) return;
+
+    rows = parseInt(rows, 10);
+    cols = parseInt(cols, 10);
+
+    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0 || rows > 20 || cols > 20) {
+        alert('行数和列数必须是 1 到 20 之间的整数。');
+        return;
+    }
+
+    // 生成简单表格HTML结构
+    let tableHtml = '<table>';
+    tableHtml += '<thead><tr>';
+    for (let c = 0; c < cols; c++) {
+        tableHtml += `<th>标题 ${c + 1}</th>`;
+    }
+    tableHtml += '</tr></thead>';
+
+    tableHtml += '<tbody>';
+    for (let r = 0; r < rows - 1; r++) {
+        tableHtml += '<tr>';
+        for (let c = 0; c < cols; c++) {
+            tableHtml += '<td>内容</td>';
+        }
+        tableHtml += '</tr>';
+    }
+    tableHtml += '</tbody></table>';
+
+    // 使用 insertHTML 将表格插入到当前光标位置
+    document.execCommand('insertHTML', false, tableHtml);
+}
+
+/**
+ * 触发本地图片上传
+ */
+function triggerImageUpload() {
+    const input = document.getElementById('imageFileInput');
+    if (input) {
+        input.click();
+    }
+}
+
+/**
+ * 处理本地图片上传并插入到编辑区域
+ * @param {Event} event - change 事件
+ */
+function handleImageUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        alert('请选择图片文件。');
+        event.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        focusContentEditor();
+        // 使用 insertImage 命令插入图片
+        document.execCommand('insertImage', false, dataUrl);
+    };
+    reader.readAsDataURL(file);
+
+    // 重置 input，以便下一次可以选择同一文件
+    event.target.value = '';
+}
+
+/**
+ * 通过URL插入图片
+ */
+function insertImageByUrlPrompt() {
+    const url = prompt('请输入图片URL：', 'https://');
+    if (!url || url === 'https://') return;
+
+    focusContentEditor();
+    document.execCommand('insertImage', false, url);
+}
 
 
