@@ -570,7 +570,7 @@ window.addEventListener('DOMContentLoaded', () => {
             // 当前删除按钮使用 .btn-danger 样式，且文本为“删除”
             if (target.classList.contains('btn-danger') || target.textContent.trim() === '删除') {
                 console.log('[Click] deleteBtn');
-                // 不阻止现有 inline onclick=\"deleteDiary(id)\"，由原逻辑完成云端删除和刷新列表
+                // 不阻止现有 inline onclick="deleteDiary(id)"，由原逻辑完成云端删除和刷新列表
                 alert('正在删除日记...');
             }
         });
@@ -589,3 +589,5 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     })();
 });
+
+

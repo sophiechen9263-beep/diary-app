@@ -24,12 +24,12 @@
                 <input type="file" class="file-input" id="fileInput" accept=".json" onchange="handleFileImport(event)">
             </div>
         </div>
-
+        
         <!-- 日记列表区域 -->
         <div class="diary-list" id="diaryList">
             <!-- 日记项将通过JavaScript动态生成 -->
         </div>
-
+        
         <!-- 编辑/新建日记区域 -->
         <div class="editor" id="editor">
             <div class="editor-header">
@@ -43,26 +43,26 @@
                     <label class="form-label">日期</label>
                     <input type="date" class="form-input" id="diaryDate" required>
                 </div>
-
+                
                 <!-- 标题输入 -->
                 <div class="form-group">
                     <label class="form-label">标题</label>
                     <input type="text" class="form-input" id="diaryTitle" placeholder="输入日记标题..." required>
                 </div>
-
+                
                 <!-- 内容输入 -->
                 <div class="form-group">
                     <label class="form-label">内容</label>
                     <textarea class="form-input form-textarea" id="diaryContent" placeholder="记录你的想法和灵感..." required></textarea>
                 </div>
-
+                
                 <!-- 标签输入 -->
                 <div class="form-group">
                     <label class="form-label">标签（用逗号分隔）</label>
                     <input type="text" class="form-input form-tags" id="diaryTags" placeholder="例如：工作, 灵感, 生活">
                     <div class="tags-hint">多个标签请用逗号分隔，如：工作, 灵感, 生活</div>
                 </div>
-
+                
                 <!-- 操作按钮 -->
                 <div class="editor-actions">
                     <button type="button" class="btn btn-secondary" onclick="hideEditor()">取消</button>
@@ -71,8 +71,9 @@
             </form>
         </div>
     </div>
-
+    
     <!-- 引入外部JavaScript文件 -->
     <script src="script.js"></script>
 </body>
 </html>
+*** End of File
